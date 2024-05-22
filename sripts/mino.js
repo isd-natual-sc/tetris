@@ -12,7 +12,6 @@ export class Mino {
   }
 
   render() {
-    this.ctx.clearRect(0, 0, canvasW, canvasH);
     for (const row in this.minos) {
       for (const col in this.minos) {
         if (this.minos[row][col]) {
@@ -64,6 +63,8 @@ export class Mino {
   }
 
   gravity() {
+    this.ctx.clearRect(this.x, this.y, this.minos.length, this.minos.length);
+
     if (this.checkMove(0, 1)) {
       this.y++;
       this.render();
@@ -73,11 +74,11 @@ export class Mino {
   rotate() {
     // minos配列を倒す
     const lay = (a) => a[0].map((_, c) => a.map((r) => r[c])).reverse();
-
     this.minos = lay(this.minos);
   }
 
   move(e) {
+    this.ctx.clearRect(0, 0, canvasW, canvasH);
     switch (e.key) {
       case "ArrowLeft":
         if (this.checkMove(-1, 0)) this.x--;

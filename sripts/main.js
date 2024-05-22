@@ -1,4 +1,11 @@
-import { canvasH, canvasW, colMax, rowMax, tetroSize } from "./global.js";
+import {
+  canvasH,
+  canvasW,
+  colMax,
+  minos,
+  rowMax,
+  tetroSize,
+} from "./global.js";
 import { Mino } from "./mino.js";
 import { Random } from "./lib.js";
 
@@ -21,108 +28,48 @@ for (let row = 0; row < rowMax; row++) {
 function main() {
   const field = new Mino(ctx, fields, "#000000");
   field.render();
-  // I-ミノ
-  const im = {
-    blks: [
-      [0, 0, 0, 0],
-      [0, 0, 0, 0],
-      [1, 1, 1, 1],
-      [0, 0, 0, 0],
-    ],
-    color: "#A9CEEC",
-  };
-
-  // O-ミノ
-  const om = {
-    blks: [
-      [0, 0, 0, 0],
-      [0, 1, 1, 0],
-      [0, 1, 1, 0],
-      [0, 0, 0, 0],
-    ],
-    color: "#FFFF00",
-  };
-  // L-ミノ
-  const lm = {
-    blks: [
-      [0, 0, 0, 0],
-      [0, 0, 0, 1],
-      [0, 1, 1, 1],
-      [0, 0, 0, 0],
-    ],
-    color: "#FD7E00",
-  };
-
-  // J-ミノ
-  const jm = {
-    blks: [
-      [0, 0, 0, 0],
-      [0, 1, 0, 0],
-      [0, 1, 1, 1],
-      [0, 0, 0, 0],
-    ],
-    color: "#0069D8",
-  };
-
-  // Z-ミノ
-  const zm = {
-    blks: [
-      [0, 0, 0, 0],
-      [1, 1, 0, 0],
-      [0, 1, 1, 0],
-      [0, 0, 0, 0],
-    ],
-    color: "#F41400",
-  };
-
-  // S-ミノ
-  const sm = {
-    blks: [
-      [0, 0, 0, 0],
-      [0, 0, 1, 1],
-      [0, 1, 1, 0],
-      [0, 0, 0, 0],
-    ],
-    color: "#4DB56A",
-  };
-
-  // T-ミノ
-  const tm = {
-    blks: [
-      [0, 0, 0, 0],
-      [0, 0, 1, 0],
-      [0, 1, 1, 1],
-      [0, 0, 0, 0],
-    ],
-    color: "#E4007F",
-  };
-
-  const minos = [im, om, sm, zm, jm, lm, tm];
-
-  const generate = () => {
-    // 配列から取り出したテトリミノ
-    const mino = rand.randomChoice(minos);
-    return new Mino(ctx, mino.blks, mino.color);
-  };
-
-  // テトリミノのインスタンス
-  const mino = generate();
-  mino.render();
 
   console.log("Start");
-  window.addEventListener("keydown", (e) => {
-    mino.move(e);
-  });
 
   // 表示しているテトリミノ
   const displayMinos = [];
 
-  window.addEventListener("keyup", () => mino.render());
+  // テトリミノを生成する関数。
+  const generate = () => {
+    // 配列から取り出したテトリミノ
+    const mino = rand.randomChoice(minos);
+    const mi = new Mino(ctx, mino.blks, mino.color);
+    displayMinos.push(mi);
+  };
 
-  setInterval(() => {
-    if (mino.y === 17) {
-    }
-  }, 300);
+  //ブロック一つを描画する
+  // function drawBlock(x, y) {
+  //   let px = x * tetroSize;
+  //   let py = y * tetroSize;
+  //   con.fillStyle = "red";
+  //   con.fillRect(px, py, tetroSize, tetroSize);
+  //   con.strokeStyle = "black";
+  //   con.strokeRect(px, py, tetroSize, tetroSize);
+  // }
+
+  const drowMain = () => {
+    displayMinos.forEach((mino) => {
+      window.addEventListener("keydown", (e) => mino.move(e));
+      window.addEventListener("keyup", () => mino.render());
+
+      setInterval(() => {
+        if (mino.y === 17) {
+          generate();
+          drowMain();
+        } else {
+          mino.gravity();
+        }
+      }, 300);
+    });
+  };
+  // テトリミノの初期セットアップ
+  generate();
+  drowMain();
 }
 
 window.onload = () => main();
